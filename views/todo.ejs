@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ToDo List</title>
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster">
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-light bg-light">
+            <a class="navbar-brand" href="#">Todo App</a>
+        <ul class="nav justify-content-end">
+            <% if(!currentUser){ %>
+            <li class="nav-item">
+              <a class="nav-link"  style="color: black;" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" style="color: black;" href="/register">Sign Up</a>
+            </li>
+            <% } else { %>
+                <li class="nav-item">
+                    <a class="nav-link" style="color: black;" href="#">Signed In As <%= currentUser.username %></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="color: black;" href="/logout">Logout</a>
+                </li>
+            <% } %>
+        </ul>
+        </nav>
+        <div class="container mt-5">
+            <div class="row">
+                <div class="jumbotron col-md-10 offset-md-1">
+                    <div class="text-center">
+                        <h1>ToDo List</h1>
+                        <div class="container mt-4">
+                            <form class="form-inline" action="/" method="POST">
+                                <div class="form-group mb-2" style="margin-left:100px;">
+                                  <label>Todo Name:&nbsp;&nbsp;</label>
+                                  <input type="text" class="form-control" name="item" required>
+                                </div>
+                                <div class="form-group mx-sm-4 mb-2">
+                                    <label>Priority:&nbsp;&nbsp;</label>
+                                    <select class="form-control" name="priority">
+                                      <option value="0">Normal</option>
+                                      <option value="1">High</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary mb-2 ml-3">Add Todo Item</button>
+                            </form>
+                        </div>
+                        <hr>
+                        <table id="todos" class="table">
+                            <tr>
+                              <th>Status</th>
+                              <th>Todo</th>
+                              <th>Priority</th>
+                              <th colspan="2">Options</th>
+                            </tr>
+                            <% todos.forEach(function(todo) { %>
+                                <% if(todo.author.id.equals(currentUser._id)){ %>
+                                <% if(todo.priority == 1) { %>
+                                <tr>
+                                    <td>
+                                    <% if(todo.completed == 1) { %>
+                                        <input type="checkbox" checked disabled>
+                                    <% } else { %>
+                                        <input type="checkbox" disabled>
+                                    <% } %>
+                                    </td>
+                                    <td>
+                                        <% if(todo.completed == 1) { %>
+                                            <span style="text-decoration: line-through;">&nbsp; &nbsp;<%= todo.item %>&nbsp; &nbsp;</span>
+                                        <% } else { %>
+                                            <span>&nbsp; &nbsp;<%= todo.item %>&nbsp; &nbsp;</span>
+                                        <% } %>   
+                                    </td>
+                                    <td><span class="badge badge-warning" style="font-size:medium;">High</span></td>
+                                    <td><form action="/markTodo" method="POST">
+                                            <input type="hidden" name="id" value="<%= todo._id %>">
+                                            <input type="hidden" name="completed" value="<%= todo.completed %>">
+                                            <% if(todo.completed == 0) { %>
+                                                <button class="btn btn-light btn-sm" data-toggle="tooltip" data-placement="right" title="Mark As Completed">
+                                                    <svg class="bi bi-check-circle" width="1.5em" height="1.5em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                        <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3-3a.5.5 0 11.708-.708L8 9.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+                                                        <path fill-rule="evenodd" d="M8 2.5A5.5 5.5 0 1013.5 8a.5.5 0 011 0 6.5 6.5 0 11-3.25-5.63.5.5 0 11-.5.865A5.472 5.472 0 008 2.5z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                </button>
+                                            <% } else { %>
+                                                <button class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="right" title="Undo">
+                                                    <svg class="bi bi-check-circle" width="1.5em" height="1.5em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                        <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3-3a.5.5 0 11.708-.708L8 9.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+                                                        <path fill-rule="evenodd" d="M8 2.5A5.5 5.5 0 1013.5 8a.5.5 0 011 0 6.5 6.5 0 11-3.25-5.63.5.5 0 11-.5.865A5.472 5.472 0 008 2.5z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                </button>
+                                            <% } %>
+                                    </form></td>
+                                    <td><form action="/deleteTodo" method="POST">
+                                        <input type="hidden" name="id" value="<%= todo._id %>">
+                                        <button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="right" title="Delete">
+                                            <svg class="bi bi-trash-fill" width="1.5em" height="1.5em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M2.5 1a1 1 0 00-1 1v1a1 1 0 001 1H3v9a2 2 0 002 2h6a2 2 0 002-2V4h.5a1 1 0 001-1V2a1 1 0 00-1-1H10a1 1 0 00-1-1H7a1 1 0 00-1 1H2.5zm3 4a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7a.5.5 0 01.5-.5zM8 5a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7A.5.5 0 018 5zm3 .5a.5.5 0 00-1 0v7a.5.5 0 001 0v-7z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </button>
+                                    </form></td>
+                                </tr>
+                            <% }}}); %>
+                            <% todos.forEach(function(todo) { %>
+                                <% if(todo.author.id.equals(currentUser._id)){ %>
+                                <% if(todo.priority == 0) { %>
+                                <tr>
+                                    <td>
+                                    <% if(todo.completed == 1) { %>
+                                        <input type="checkbox" checked disabled>
+                                    <% } else { %>
+                                        <input type="checkbox" disabled>
+                                    <% } %>
+                                    </td>
+                                    <td>
+                                        <% if(todo.completed == 1) { %>
+                                            <span style="text-decoration: line-through;">&nbsp; &nbsp;<%= todo.item %>&nbsp; &nbsp;</span>
+                                        <% } else { %>
+                                            <span>&nbsp; &nbsp;<%= todo.item %>&nbsp; &nbsp;</span>
+                                        <% } %>   
+                                    </td>
+                                    <td><span class="badge badge-info" style="font-size:medium;">Normal</span></td>
+                                    <td><form action="/markTodo" method="POST">
+                                            <input type="hidden" name="id" value="<%= todo._id %>">
+                                            <input type="hidden" name="completed" value="<%= todo.completed %>">
+                                            <% if(todo.completed == 0) { %>
+                                                <button class="btn btn-light btn-sm" data-toggle="tooltip" data-placement="right" title="Mark As Completed">
+                                                    <svg class="bi bi-check-circle" width="1.5em" height="1.5em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                        <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3-3a.5.5 0 11.708-.708L8 9.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+                                                        <path fill-rule="evenodd" d="M8 2.5A5.5 5.5 0 1013.5 8a.5.5 0 011 0 6.5 6.5 0 11-3.25-5.63.5.5 0 11-.5.865A5.472 5.472 0 008 2.5z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                </button>
+                                            <% } else { %>
+                                                <button class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="right" title="Undo">
+                                                    <svg class="bi bi-check-circle" width="1.5em" height="1.5em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                        <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3-3a.5.5 0 11.708-.708L8 9.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+                                                        <path fill-rule="evenodd" d="M8 2.5A5.5 5.5 0 1013.5 8a.5.5 0 011 0 6.5 6.5 0 11-3.25-5.63.5.5 0 11-.5.865A5.472 5.472 0 008 2.5z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                </button>
+                                            <% } %>
+                                    </form></td>
+                                    <td><form action="/deleteTodo" method="POST">
+                                        <input type="hidden" name="id" value="<%= todo._id %>">
+                                        <button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="right" title="Delete">
+                                            <svg class="bi bi-trash-fill" width="1.5em" height="1.5em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M2.5 1a1 1 0 00-1 1v1a1 1 0 001 1H3v9a2 2 0 002 2h6a2 2 0 002-2V4h.5a1 1 0 001-1V2a1 1 0 00-1-1H10a1 1 0 00-1-1H7a1 1 0 00-1 1H2.5zm3 4a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7a.5.5 0 01.5-.5zM8 5a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7A.5.5 0 018 5zm3 .5a.5.5 0 00-1 0v7a.5.5 0 001 0v-7z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </button>
+                                    </form></td>
+                                </tr>
+                            <% }}}); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
